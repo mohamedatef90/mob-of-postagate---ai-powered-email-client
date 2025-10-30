@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/1tcwBt1Q/Modern-Logo-Minimalist-logo-Business-logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PostaGate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+      /* Light Theme (Default) */
+      :root {
+        --background: 0 0% 100% / 0.75; /* Brighter, more neutral white */
+        --foreground: 222.2 40% 20%; /* Dark blue-gray */
+        --card: 0 0% 100%; /* #ffffff */
+        --card-foreground: 222.2 40% 20%;
+        --popover: 0 0% 100% / 0.8;
+        --popover-foreground: 222.2 40% 20%;
+        --primary: 219 85% 27%; /* #0B3C81 */
+        --primary-gradient-start: 214 75% 23%; /* #103567 */
+        --primary-gradient-end: 219 85% 27%; /* #0B3C81 */
+        --primary-foreground: 0 0% 100%; /* White */
+        --secondary: 215 16% 93%; /* #e8ecf1 - slate-200 */
+        --secondary-foreground: 222 29% 17%; /* #1e293b - slate-800 */
+        --muted: 215 16% 83% / 0.6; /* Based on slate-300 */
+        --muted-foreground: 220 10% 45%; /* Medium gray-blue */
+        --accent: 215 16% 83% / 0.5; /* Based on slate-300 */
+        --accent-foreground: 222 29% 17%; /* Based on slate-800 */
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 220 15% 85% / 0.5; /* Darker, more visible border */
+        --input: 220 15% 85% / 0.5; /* Match border for consistency */
+        --ring: 219 85% 27%;
+        --radius: 0.75rem;
+      }
+
+      /* Dark Theme */
+      .dark {
+        /* Base Colors - Dark, semi-transparent for the glass effect */
+        --background: 224 20% 14% / 0.75; /* A deep, semi-transparent blue */
+        --card: 224 20% 18%;
+        --popover: 224 20% 10% / 0.8; /* More opaque for popovers */
+
+        /* Text Colors - Bright for contrast */
+        --foreground: 210 40% 98%;
+        --card-foreground: 210 40% 98%;
+        --popover-foreground: 210 40% 98%;
+        --primary-foreground: 190 100% 98%; /* Bright text on primary color */
+        --secondary-foreground: 210 40% 98%;
+        --muted-foreground: 210 40% 65%; /* Softer gray for less important text */
+        --accent-foreground: 210 40% 98%;
+        --destructive-foreground: 210 40% 98%;
+
+        /* Interactive/Accent Colors */
+        --primary: 190 80% 50%; /* A vibrant cyan, like the reference */
+        --secondary: 224 20% 25%; /* A slightly more opaque/lighter blue for selections */
+        --muted: 224 20% 25% / 0.5;
+        --accent: 224 20% 30% / 0.6; /* Hover state */
+        --destructive: 0 63% 45%;
+
+        /* Borders & Rings */
+        --border: 210 20% 80% / 0.1; /* A very faint, light border to create the glowing edge */
+        --input: 224 20% 25% / 0.5;
+        --ring: 190 80% 60%; /* A slightly lighter version of primary for focus rings */
+      }
+
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: hsl(var(--background));
+        color: hsl(var(--foreground));
+        background-image: linear-gradient(rgba(219, 234, 254, 0.3), rgba(219, 234, 254, 0.3)), url('https://i.postimg.cc/1zwDZFyV/28981457.jpg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+      }
+      
+      .dark body {
+          background-image: url('https://i.pinimg.com/736x/98/8d/46/988d/46/9d/46297b73c491d95ca2f00e017e45.jpg');
+          background-size: cover;
+          background-position: center;
+          background-attachment: fixed;
+      }
+
+      /* Modern, Minimal Scrollbar */
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background-color: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background-color: hsl(var(--secondary));
+        border-radius: 10px;
+        border: 3px solid hsl(var(--background));
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: hsl(var(--muted-foreground));
+        border-color: hsl(var(--background));
+      }
+
+      /* Animations */
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes scaleIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+      }
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .animate-fadeIn {
+        animation: fadeIn 0.3s ease-in-out;
+      }
+       .animate-scaleIn {
+        animation: scaleIn 0.2s ease-out;
+      }
+      .animate-fadeInUp {
+        animation: fadeInUp 0.5s ease-out forwards;
+      }
+      .animate-fadeInDown {
+        animation: fadeInDown 0.2s ease-out;
+      }
+
+      /* Hide scrollbar but allow scrolling */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+      }
+
+      /* Gradient Primary Color Overrides */
+      .bg-primary {
+        background-image: linear-gradient(to right, hsl(var(--primary-gradient-start)), hsl(var(--primary-gradient-end)));
+      }
+      .dark .bg-primary {
+         background-image: none;
+         background-color: hsl(var(--primary));
+      }
+      .text-primary {
+        background: linear-gradient(to right, hsl(var(--primary-gradient-start)), hsl(var(--primary-gradient-end)));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-fill-color: transparent;
+      }
+      .dark .text-primary {
+        background: hsl(var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-fill-color: transparent;
+      }
+      .hover\:bg-primary\/90:hover {
+          filter: brightness(1.1);
+          transition: filter .2s ease-in-out;
+      }
+      .dark .hover\:bg-primary\/90:hover {
+          background-color: hsl(var(--primary) / 0.9);
+          filter: none;
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            borderRadius: {
+                '2xl': '1rem',
+                'xl': 'calc(var(--radius) + 4px)',
+                lg: `var(--radius)`,
+                md: `calc(var(--radius) - 4px)`,
+                sm: `calc(var(--radius) - 8px)`,
+            },
+            colors: {
+              border: 'hsl(var(--border))',
+              input: 'hsl(var(--input))',
+              ring: 'hsl(var(--ring))',
+              background: 'hsl(var(--background))',
+              foreground: 'hsl(var(--foreground))',
+              primary: {
+                DEFAULT: 'hsl(var(--primary))',
+                foreground: 'hsl(var(--primary-foreground))',
+              },
+              secondary: {
+                DEFAULT: 'hsl(var(--secondary))',
+                foreground: 'hsl(var(--secondary-foreground))',
+              },
+              destructive: {
+                DEFAULT: 'hsl(var(--destructive))',
+                foreground: 'hsl(var(--destructive-foreground))',
+              },
+              muted: {
+                DEFAULT: 'hsl(var(--muted))',
+                foreground: 'hsl(var(--muted-foreground))',
+              },
+              accent: {
+                DEFAULT: 'hsl(var(--accent))',
+                foreground: 'hsl(var(--accent-foreground))',
+              },
+              popover: {
+                DEFAULT: 'hsl(var(--popover))',
+                foreground: 'hsl(var(--popover-foreground))',
+              },
+              card: {
+                DEFAULT: 'hsl(var(--card))',
+                foreground: 'hsl(var(--card-foreground))',
+              },
+            },
+          }
+        }
+      }
+    </script>
+     <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.27.0"
+  }
+}
+</script>
+  <link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-background text-foreground antialiased">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
