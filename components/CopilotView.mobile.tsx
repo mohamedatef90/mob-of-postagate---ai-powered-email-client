@@ -83,10 +83,11 @@ const cn = (...classes: (string | boolean | undefined)[]) => classes.filter(Bool
 
 const CopilotViewMobile: React.FC = () => {
   const [conversations, setConversations] = useState<CopilotConversation[]>(MOCK_COPILOT_CONVERSATIONS);
-  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>('new');
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isAttachEmailModalOpen, setIsAttachEmailModalOpen] = useState(false);
+  const [isHistorySidebarOpen, setIsHistorySidebarOpen] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const selectedConversation = useMemo(() => {
@@ -101,11 +102,13 @@ const CopilotViewMobile: React.FC = () => {
   const handleNewChat = () => {
     setSelectedConversationId('new');
     setInput('');
+    setIsHistorySidebarOpen(false);
   }
-  
-  const handleBack = () => {
-    setSelectedConversationId(null);
-  };
+
+  const handleSelectConversation = (id: string) => {
+    setSelectedConversationId(id);
+    setIsHistorySidebarOpen(false);
+  }
 
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return;
@@ -191,48 +194,50 @@ const CopilotViewMobile: React.FC = () => {
   };
 
   const lastMessage = selectedConversation?.messages[selectedConversation.messages.length - 1];
-  const showDetailView = !!selectedConversationId;
 
   return (
-    <div className="flex h-full w-full bg-background relative">
-      {/* Copilot History Sidebar */}
-      <div className={cn(
-          "w-full border-r border-border flex-shrink-0 flex flex-col h-full",
-          showDetailView ? "hidden" : "flex"
+    <div className="flex h-full w-full bg-background relative overflow-hidden">
+        {/* History Sidebar */}
+        <aside className={cn(
+            "absolute top-0 left-0 h-full w-[300px] bg-card border-r border-border flex-shrink-0 flex flex-col z-20 transition-transform duration-300 ease-in-out",
+            isHistorySidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}>
-          <div className="p-4 border-b border-border flex-shrink-0 flex items-center justify-between">
-              <h2 className="text-xl font-bold">Copilot Chats</h2>
-          </div>
-           <div className="relative p-3 border-b border-border flex-shrink-0">
-              <i className="fa-solid fa-magnifying-glass absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"></i>
-              <Input
-                  type="text"
-                  placeholder="Search chats..."
-                  className="w-full bg-secondary border-none rounded-lg pl-10 pr-4 py-2 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              />
-          </div>
-          <div className="flex-1 overflow-y-auto p-2 space-y-1">
+            <div className="p-4 border-b border-border flex-shrink-0 flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                  <i className="fa-solid fa-wand-magic-sparkles text-xl text-primary"></i>
+                  <h2 className="text-xl font-bold">WP Flag Chats</h2>
+              </div>
+              <Button onClick={handleNewChat} variant="ghost" size="icon" title="New Chat" className="inline-flex">
+                  <i className="fa-solid fa-square-plus w-5 h-5"></i>
+              </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-2 space-y-1">
               {conversations.map(conv => (
-                  <CopilotHistoryItem key={conv.id} conversation={conv} isSelected={conv.id === selectedConversationId} onSelect={setSelectedConversationId} />
+                  <CopilotHistoryItem key={conv.id} conversation={conv} isSelected={conv.id === selectedConversationId} onSelect={handleSelectConversation} />
               ))}
           </div>
-      </div>
-      
-      {/* Main Chat Window */}
-      <div className={cn(
-          "flex flex-col flex-1 h-full bg-card backdrop-blur-xl",
-          showDetailView ? "flex" : "hidden"
-      )}>
-          <header className="p-2 border-b border-border flex items-center flex-shrink-0">
-                <Button variant="ghost" size="icon" onClick={handleBack} className="h-10 w-10">
-                    <i className="fa-solid fa-arrow-left w-5 h-5"></i>
+        </aside>
+
+        {isHistorySidebarOpen && (
+            <div 
+                onClick={() => setIsHistorySidebarOpen(false)}
+                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-10"
+                aria-hidden="true"
+            ></div>
+        )}
+
+        {/* Main Chat Window */}
+        <div className="flex flex-col flex-1 h-full bg-card">
+            <header className="p-2 border-b border-border flex items-center flex-shrink-0">
+                <Button variant="ghost" size="icon" onClick={() => setIsHistorySidebarOpen(true)} className="h-10 w-10">
+                    <i className="fa-solid fa-bars w-5 h-5"></i>
                 </Button>
                 <h2 className="text-lg font-bold ml-2 truncate">{selectedConversation?.title || "New Chat"}</h2>
            </header>
           {/* Main chat area */}
           <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4">
-              <div className="max-w-3xl mx-auto">
-                  {selectedConversationId ? (
+              <div className="max-w-3xl mx-auto pb-[50px]">
+                  {(selectedConversationId || selectedConversationId === 'new') ? (
                       <div className="space-y-6">
                            {selectedConversationId === 'new' && !selectedConversation?.messages.length && (
                                 <div className="text-center text-muted-foreground animate-fadeIn pt-20">
@@ -264,7 +269,15 @@ const CopilotViewMobile: React.FC = () => {
                               </div>
                            )}
                       </div>
-                  ) : null}
+                  ) : (
+                     <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground animate-fadeIn">
+                          <div className="inline-block bg-primary p-4 rounded-full shadow-lg">
+                             <i className="fa-solid fa-wand-magic-sparkles text-5xl text-primary-foreground"></i>
+                          </div>
+                          <h1 className="text-3xl font-bold text-foreground mt-4">Hello, {you.name.split(' ')[0]}.</h1>
+                          <p className="mt-2">Select a chat to continue or start a new one.</p>
+                      </div>
+                  )}
               </div>
           </div>
           {/* Input area */}
@@ -278,7 +291,7 @@ const CopilotViewMobile: React.FC = () => {
                           <i className="fa-solid fa-at w-5 h-5 text-muted-foreground"></i>
                       </Button>
                       <textarea
-                          placeholder="Message Copilot..."
+                          placeholder="Message WP Flag..."
                           value={input}
                           onChange={(e) => setInput(e.target.value)}
                           onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
@@ -300,16 +313,11 @@ const CopilotViewMobile: React.FC = () => {
                           <i className="fa-solid fa-arrow-up w-5 h-5"></i>
                       </Button>
                   </div>
-                  <p className="text-xs text-center text-muted-foreground mt-2">Copilot may display inaccurate info, so double-check its responses.</p>
+                  <p className="text-xs text-center text-muted-foreground mt-2">WP Flag may display inaccurate info, so double-check its responses.</p>
               </div>
           </div>
-      </div>
-      <div className="absolute bottom-20 right-4 z-10">
-          <Button onClick={handleNewChat} size="lg" className="rounded-full shadow-lg h-14 w-14">
-              <i className="fa-solid fa-plus w-6 h-6"></i>
-          </Button>
-      </div>
-       <AttachEmailModal 
+        </div>
+        <AttachEmailModal 
             isOpen={isAttachEmailModalOpen}
             onClose={() => setIsAttachEmailModalOpen(false)}
             threads={MOCK_THREADS}

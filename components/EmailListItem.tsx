@@ -313,7 +313,17 @@ const EmailListItem: React.FC<EmailListItemProps> = ({
             </p>
             <div className="flex items-center space-x-2">
               <p className="text-xs text-muted-foreground whitespace-nowrap group-hover:hidden">{formatDate(thread.timestamp)}</p>
+              {/* Show filled star when not hovering */}
+              {thread.isStarred && (
+                  <div className="flex group-hover:hidden items-center text-yellow-400" title="Starred">
+                      <i className="fa-solid fa-star w-4 h-4"></i>
+                  </div>
+              )}
+              {/* Show all actions on hover */}
               <div className="hidden group-hover:flex items-center text-muted-foreground">
+                  <button onClick={(e) => { e.stopPropagation(); onToggleStar(thread.id); }} className="h-7 w-7 flex items-center justify-center rounded-md hover:bg-background" title={thread.isStarred ? 'Unstar' : 'Star'}>
+                      <i className={cn('w-4 h-4', thread.isStarred ? 'fa-solid fa-star text-yellow-400' : 'fa-regular fa-star')}></i>
+                  </button>
                   <button onClick={(e) => { e.stopPropagation(); onSnoozeClick(thread.id, e.currentTarget); }} className="h-7 w-7 flex items-center justify-center rounded-md hover:bg-background" title="Snooze"><i className="fa-regular fa-clock w-4 h-4"></i></button>
                   <button onClick={(e) => { e.stopPropagation(); onOpenKebabMenu(thread.id, e.currentTarget); }} className="h-7 w-7 flex items-center justify-center rounded-md hover:bg-background" title="More options"><i className="fa-solid fa-ellipsis-v w-4 h-4"></i></button>
               </div>

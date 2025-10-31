@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import type { ChatConversation, ChatMessage, User, Thread } from '../types';
 import { MOCK_CHAT_CONVERSATIONS, allUsers, you, MOCK_THREADS } from '../constants';
 import { Button } from './ui/Button';
-import NewChatMenu from './NewChatMenu';
 import AttachEmailModal from './AttachEmailModal';
+import NewChatMobile from './NewChat.mobile';
 
 
 const ChatListItem: React.FC<{ conversation: ChatConversation; isSelected: boolean; onSelect: (id: string) => void }> = ({ conversation, isSelected, onSelect }) => {
@@ -69,9 +69,8 @@ const ChatViewMobile: React.FC = () => {
     const [conversations, setConversations] = useState<ChatConversation[]>(MOCK_CHAT_CONVERSATIONS);
     const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
     const [input, setInput] = useState('');
-    const [isNewChatMenuOpen, setIsNewChatMenuOpen] = useState(false);
+    const [isCreatingChat, setIsCreatingChat] = useState(false);
     const [isAttachEmailModalOpen, setIsAttachEmailModalOpen] = useState(false);
-    const newChatButtonRef = useRef<HTMLButtonElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -120,7 +119,7 @@ const ChatViewMobile: React.FC = () => {
             setConversations(prev => [newConversation, ...prev]);
             setSelectedConversationId(newConversation.id);
         }
-        setIsNewChatMenuOpen(false);
+        setIsCreatingChat(false);
     };
 
     const handleCreateGroup = (users: User[]) => {
@@ -147,7 +146,7 @@ const ChatViewMobile: React.FC = () => {
         };
         setConversations(prev => [newConversation, ...prev]);
         setSelectedConversationId(newConversation.id);
-        setIsNewChatMenuOpen(false);
+        setIsCreatingChat(false);
     };
 
     const handleAttachEmail = (thread: Thread) => {
@@ -169,8 +168,18 @@ const ChatViewMobile: React.FC = () => {
         setSelectedConversationId(null);
     };
 
-    const showDetailView = !!selectedConversationId;
+    if (isCreatingChat) {
+        return (
+            <NewChatMobile
+                onBack={() => setIsCreatingChat(false)}
+                users={allUsers}
+                onSelectUser={handleSelectUser}
+                onCreateGroup={handleCreateGroup}
+            />
+        );
+    }
 
+    const showDetailView = !!selectedConversationId;
 
     return (
         <div className="flex h-full w-full bg-background">
@@ -182,8 +191,7 @@ const ChatViewMobile: React.FC = () => {
                 <div className="p-4 border-b border-border flex-shrink-0 flex items-center justify-between">
                     <h2 className="text-xl font-bold">Chats</h2>
                     <Button 
-                        ref={newChatButtonRef}
-                        onClick={() => setIsNewChatMenuOpen(true)}
+                        onClick={() => setIsCreatingChat(true)}
                         variant="ghost" 
                         size="icon" 
                         title="New Chat"
@@ -262,14 +270,6 @@ const ChatViewMobile: React.FC = () => {
                     </>
                 ) : null}
             </div>
-             <NewChatMenu
-                isOpen={isNewChatMenuOpen}
-                onClose={() => setIsNewChatMenuOpen(false)}
-                users={allUsers}
-                anchorEl={newChatButtonRef.current}
-                onSelectUser={handleSelectUser}
-                onCreateGroup={handleCreateGroup}
-            />
             <AttachEmailModal 
                 isOpen={isAttachEmailModalOpen}
                 onClose={() => setIsAttachEmailModalOpen(false)}

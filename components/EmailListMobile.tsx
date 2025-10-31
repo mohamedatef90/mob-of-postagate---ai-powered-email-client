@@ -1,7 +1,7 @@
 import React, { useState, useRef, useMemo } from 'react';
 import type { Thread, User } from '../types';
 import EmailListItemMobile from './EmailListItem.mobile';
-import { Button } from './ui/Button';
+import EmailListHeaderMobile from './EmailListHeader.mobile';
 
 const cn = (...classes: (string | boolean | undefined)[]) => classes.filter(Boolean).join(' ');
 
@@ -94,7 +94,7 @@ const EmailListMobile: React.FC<EmailListMobileProps> = ({
     const olderThreads = threads.filter(t => new Date(t.timestamp) < startOfLastWeek);
       
     const items: any[] = [];
-    let currentOffset = 0;
+    let currentOffset = 40;
 
     const addSection = (title: string, threadsInSection: Thread[]) => {
       if (threadsInSection.length > 0) {
@@ -140,49 +140,19 @@ const EmailListMobile: React.FC<EmailListMobileProps> = ({
   const pillViews = ['inbox', 'todos', 'archive'];
   const showPillMenu = pillViews.includes(activeView) && !isBulkMode;
 
-  const MobileHeader = (
-    <div className="p-2 border-b border-border flex flex-col flex-shrink-0 bg-background/80 backdrop-blur-lg">
-      <div className="flex items-center justify-between">
-        {isBulkMode ? (
-          <>
-            <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="icon" onClick={onClearSelection} className="h-10 w-10 text-muted-foreground" aria-label="Cancel selection">
-                  <i className="fa-solid fa-xmark w-5 h-5"></i>
-              </Button>
-              <span className="font-semibold text-lg">{selectedThreadIds.length} selected</span>
-            </div>
-            <div className="flex items-center">
-              <Button variant="ghost" size="icon" onClick={onBulkArchive} className="h-10 w-10 text-muted-foreground" aria-label="Archive selected"><i className="fa-solid fa-archive w-5 h-5"></i></Button>
-              <Button variant="ghost" size="icon" onClick={onBulkDelete} className="h-10 w-10 text-muted-foreground" aria-label="Delete selected"><i className="fa-solid fa-trash w-5 h-5"></i></Button>
-              <Button variant="ghost" size="icon" onClick={onBulkMarkAsRead} className="h-10 w-10 text-muted-foreground" aria-label="Mark selected as read"><i className="fa-regular fa-envelope-open w-5 h-5"></i></Button>
-            </div>
-          </>
-        ) : (
-          <>
-              <div className="flex items-center space-x-2">
-                  <Button 
-                      variant="ghost"
-                      size="icon"
-                      onClick={toggleEmailSidebar}
-                      className="h-10 w-10 text-muted-foreground"
-                      aria-label="Toggle menu"
-                  >
-                      <i className="fa-solid fa-bars w-5 h-5"></i>
-                  </Button>
-                  <div>
-                    <h1 className="font-semibold text-lg leading-tight">{title}</h1>
-                    <p className="text-xs text-muted-foreground leading-tight">{currentUser.email}</p>
-                  </div>
-              </div>
-          </>
-        )}
-      </div>
-    </div>
-  );
-
   return (
     <div className="bg-card flex flex-col h-full w-full dark:backdrop-blur-xl relative">
-      {MobileHeader}
+      <EmailListHeaderMobile
+        isBulkMode={isBulkMode}
+        selectedCount={selectedThreadIds.length}
+        onClearSelection={onClearSelection}
+        onBulkArchive={onBulkArchive}
+        onBulkDelete={onBulkDelete}
+        onBulkMarkAsRead={onBulkMarkAsRead}
+        toggleEmailSidebar={toggleEmailSidebar}
+        title={title}
+        currentUser={currentUser}
+      />
       {threads.length === 0 ? (
         (() => {
             const config = EMPTY_STATE_CONFIG[activeView] || EMPTY_STATE_CONFIG.default;
@@ -234,7 +204,7 @@ const EmailListMobile: React.FC<EmailListMobileProps> = ({
         </div>
       )}
        {showPillMenu && (
-          <div className="absolute top-[50px] left-1/2 -translate-x-1/2 z-10 w-[80%] max-w-xs animate-fadeInDown" style={{animationDuration: '0.3s'}}>
+          <div className="absolute top-[60px] left-1/2 -translate-x-1/2 z-10 w-[90%] max-w-sm animate-fadeInDown" style={{animationDuration: '0.3s'}}>
               <div className="bg-card/70 backdrop-blur-xl rounded-full shadow-lg border border-white/20 flex p-1 justify-around space-x-1">
                   {pillViews.map(view => {
                       const isActive = activeView === view;
@@ -243,7 +213,7 @@ const EmailListMobile: React.FC<EmailListMobileProps> = ({
                           key={view}
                           onClick={() => onNavigate(view)}
                           className={cn(
-                              "w-full text-center px-3 py-2 text-xs font-semibold rounded-full transition-all duration-200",
+                              "w-full text-center px-4 py-3 text-sm font-semibold rounded-full transition-all duration-200",
                               isActive
                                 ? 'bg-accent text-accent-foreground shadow-sm'
                                 : 'text-muted-foreground hover:bg-accent/50'
@@ -256,13 +226,13 @@ const EmailListMobile: React.FC<EmailListMobileProps> = ({
               </div>
           </div>
       )}
-       <div className="absolute bottom-28 right-4 z-10">
+       <div className="absolute bottom-32 right-4 z-10">
           <button
             onClick={onCompose}
             className="h-14 w-14 rounded-full bg-primary/80 backdrop-blur-lg text-primary-foreground flex items-center justify-center shadow-lg border border-white/20 hover:bg-primary/90 transition-all duration-200 animate-scaleIn"
             aria-label="Compose new email"
           >
-              <i className="fa-regular fa-envelope text-xl"></i>
+              <i className="fa-solid fa-pen-to-square text-xl"></i>
           </button>
       </div>
     </div>

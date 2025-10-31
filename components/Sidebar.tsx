@@ -82,7 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarOpen, activeView, activeDoma
         <div className="p-4 flex-shrink-0">
           <h1 className="text-2xl font-bold text-foreground">PostaGate</h1>
         </div>
-        <div className="px-4 pb-4">
+        <div className="px-4 pb-4 hidden md:block">
           <button onClick={onComposeClick} className="w-full bg-primary text-primary-foreground font-semibold py-2.5 px-4 rounded-full shadow-lg shadow-primary/40 hover:bg-primary/90 transition-all duration-200 flex items-center justify-center space-x-2">
             <i className="fa-solid fa-pencil w-5 h-5"></i>
             <span>Compose</span>

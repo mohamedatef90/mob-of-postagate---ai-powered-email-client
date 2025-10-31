@@ -45,8 +45,8 @@ const PrimarySidebar: React.FC<PrimarySidebarProps> = ({ activeModule, onNavigat
           onClick={onNavigate}
         />
         <NavButton
-          icon={<i className="fa-solid fa-sparkles w-6 h-6"></i>}
-          label="Copilot"
+          icon={<i className="fa-solid fa-wand-magic-sparkles w-6 h-6"></i>}
+          label="WP Flag"
           module="copilot"
           isActive={activeModule === 'copilot'}
           onClick={onNavigate}

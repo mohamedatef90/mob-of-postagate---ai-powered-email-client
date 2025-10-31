@@ -81,17 +81,11 @@ const CopilotHistoryItem: React.FC<{ conversation: CopilotConversation; isSelect
 
 const CopilotView: React.FC = () => {
   const [conversations, setConversations] = useState<CopilotConversation[]>(MOCK_COPILOT_CONVERSATIONS);
-  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>('new');
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isAttachEmailModalOpen, setIsAttachEmailModalOpen] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (conversations.length > 0 && !selectedConversationId) {
-        setSelectedConversationId(conversations[0].id);
-    }
-  }, [conversations, selectedConversationId]);
 
   const selectedConversation = useMemo(() => {
     if (selectedConversationId === 'new') return null;
@@ -197,7 +191,10 @@ const CopilotView: React.FC = () => {
       {/* Copilot History Sidebar */}
       <div className="w-[320px] lg:w-[360px] border-r border-border flex-shrink-0 flex flex-col h-full">
           <div className="p-4 border-b border-border flex-shrink-0 flex items-center justify-between">
-              <h2 className="text-xl font-bold">Copilot Chats</h2>
+              <div className="flex items-center space-x-3">
+                  <i className="fa-solid fa-wand-magic-sparkles text-xl text-primary"></i>
+                  <h2 className="text-xl font-bold">WP Flag Chats</h2>
+              </div>
               <Button onClick={handleNewChat} variant="ghost" size="icon" title="New Chat" className="inline-flex">
                   <i className="fa-solid fa-square-plus w-5 h-5"></i>
               </Button>
@@ -221,7 +218,7 @@ const CopilotView: React.FC = () => {
       <div className="flex flex-col flex-1 h-full bg-card backdrop-blur-xl">
           {/* Main chat area */}
           <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6">
-              <div className="max-w-3xl mx-auto">
+              <div className="max-w-3xl mx-auto pb-[50px]">
                   {!selectedConversation && selectedConversationId !== 'new' ? (
                       <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground animate-fadeIn">
                           <div className="inline-block bg-primary p-4 rounded-full shadow-lg">
@@ -276,7 +273,7 @@ const CopilotView: React.FC = () => {
                           <i className="fa-solid fa-at w-5 h-5 text-muted-foreground"></i>
                       </Button>
                       <textarea
-                          placeholder="Message Copilot..."
+                          placeholder="Message WP Flag..."
                           value={input}
                           onChange={(e) => setInput(e.target.value)}
                           onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
@@ -298,7 +295,7 @@ const CopilotView: React.FC = () => {
                           <i className="fa-solid fa-arrow-up w-5 h-5"></i>
                       </Button>
                   </div>
-                  <p className="text-xs text-center text-muted-foreground mt-2">Copilot may display inaccurate info, so double-check its responses.</p>
+                  <p className="text-xs text-center text-muted-foreground mt-2">WP Flag may display inaccurate info, so double-check its responses.</p>
               </div>
           </div>
       </div>

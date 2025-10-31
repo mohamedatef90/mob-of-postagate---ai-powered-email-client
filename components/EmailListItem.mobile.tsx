@@ -302,6 +302,9 @@ const EmailListItemMobile: React.FC<EmailListItemProps> = ({
             </p>
             <div className="flex items-center space-x-2">
               <p className="text-xs text-muted-foreground whitespace-nowrap">{formatDate(thread.timestamp)}</p>
+              <button onClick={(e) => { e.stopPropagation(); onToggleStar(thread.id); }} className="h-7 w-7 -mr-2 flex items-center justify-center" title={thread.isStarred ? 'Unstar' : 'Star'}>
+                  <i className={cn('w-4 h-4', thread.isStarred ? 'fa-solid fa-star text-yellow-400' : 'fa-regular fa-star text-muted-foreground/60')}></i>
+              </button>
             </div>
           </div>
           <p className={`text-sm truncate ${!thread.isRead && !isSelected ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>

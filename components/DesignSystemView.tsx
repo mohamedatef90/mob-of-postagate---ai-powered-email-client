@@ -162,7 +162,7 @@ const DesignSystemView: React.FC = () => {
                         <Card className="p-6">
                             <h1 className="text-5xl font-bold">Heading 1</h1>
                             <h2 className="text-4xl font-semibold mt-2">Heading 2</h2>
-                            <h3 className="text-3xl font-semibold mt-2">Heading 3</h3>
+                            <h3 className="text-3xl font-semibold mt-2">Heading 3</h2>
                             <h4 className="text-2xl font-semibold mt-2">Heading 4</h4>
                             <p className="text-base mt-4">This is body text. It's used for long-form content and descriptions. Clean, readable, and accessible.</p>
                             <p className="text-sm text-muted-foreground mt-2">This is muted text, used for secondary information or captions.</p>

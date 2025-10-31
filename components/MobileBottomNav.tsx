@@ -36,12 +36,12 @@ const NavButton: React.FC<{
 const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ activeModule, onNavigate }) => {
   // Mobile view
   return (
-    <nav className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-30 w-full max-w-sm">
+    <nav className="md:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-30 w-full max-w-sm">
         <div className="flex justify-around items-center h-16 px-2 bg-card/60 backdrop-blur-xl rounded-full shadow-lg border border-border">
             <NavButton icon="fa-solid fa-inbox" label="Email" module="email" isActive={activeModule === 'email'} onClick={onNavigate} />
-            <NavButton icon="fa-solid fa-wand-magic-sparkles" label="Copilot" module="copilot" isActive={activeModule === 'copilot'} onClick={onNavigate} />
-            <NavButton icon="fa-solid fa-hard-drive" label="Drive" module="drive" isActive={activeModule === 'drive'} onClick={onNavigate} />
+            <NavButton icon="fa-solid fa-wand-magic-sparkles" label="WP Flag" module="copilot" isActive={activeModule === 'copilot'} onClick={onNavigate} />
             <NavButton icon="fa-solid fa-comment-dots" label="Chat" module="chat" isActive={activeModule === 'chat'} onClick={onNavigate} />
+            <NavButton icon="fa-solid fa-hard-drive" label="Drive" module="drive" isActive={activeModule === 'drive'} onClick={onNavigate} />
             <NavButton icon="fa-solid fa-gear" label="Settings" module="settings" isActive={activeModule === 'settings'} onClick={onNavigate} />
         </div>
     </nav>

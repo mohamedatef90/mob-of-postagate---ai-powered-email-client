@@ -16,6 +16,7 @@ import SnoozePopover from './components/SnoozePopover';
 import { GoogleGenAI, Type } from '@google/genai';
 import EmailView from './components/EmailView';
 import Composer from './components/Composer';
+import ComposerMobile from './components/Composer.mobile';
 import DriveView from './components/DriveView';
 import DesignSystemView from './components/DesignSystemView';
 import DesignSystemViewMobile from './components/DesignSystemView.mobile';
@@ -27,6 +28,7 @@ import MobileBottomNav from './components/MobileBottomNav';
 import EmailDetailActionBar from './components/EmailDetailActionBar';
 import UndoSnackbar from './components/ui/UndoSnackbar';
 import UndoSnackbarMobile from './components/ui/UndoSnackbar.mobile';
+import Onboarding from './components/onboarding/Onboarding';
 
 
 type Theme = 'light' | 'dark' | 'system';
@@ -41,8 +43,9 @@ export interface SearchFilters {
 }
 
 const App: React.FC = () => {
+  const [isOnboardingComplete, setIsOnboardingComplete] = useState(() => localStorage.getItem('onboardingComplete') === 'true');
   const [threads, setThreads] = useState<Thread[]>(MOCK_THREADS);
-  const [selectedThreadId, setSelectedThreadId] = useState<string | null>('thread-1');
+  const [selectedThreadId, setSelectedThreadId] = useState<string | null>(window.innerWidth < 768 ? null : 'thread-1');
   const [selectedThreadIds, setSelectedThreadIds] = useState<string[]>([]);
   
   const [activeModule, setActiveModule] = useState<Module>('email');
@@ -97,6 +100,11 @@ const App: React.FC = () => {
   const isResizingSidebar = useRef(false);
   const startSidebarX = useRef(0);
   const startSidebarWidth = useRef(0);
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('onboardingComplete', 'true');
+    setIsOnboardingComplete(true);
+  };
 
   const handleSidebarMouseDown = useCallback((e: React.MouseEvent) => {
       e.preventDefault();
@@ -742,9 +750,23 @@ const App: React.FC = () => {
   // Mobile view
   const showEmailDetailOnMobile = isMobile && activeModule === 'email' && !!selectedThreadId;
 
+  if (!isOnboardingComplete) {
+    return <Onboarding onComplete={handleOnboardingComplete} />;
+  }
+
+  if (isMobile && isComposerOpen) {
+    return (
+      <ComposerMobile
+        onClose={handleCloseComposer}
+        initialState={composerState}
+        onSend={handleSendEmail}
+      />
+    );
+  }
+
   return (
     <div className="h-screen w-screen flex overflow-hidden">
-      <Composer 
+      {!isMobile && <Composer 
         isOpen={isComposerOpen} 
         onClose={handleCloseComposer} 
         initialState={composerState} 
@@ -754,6 +776,7 @@ const App: React.FC = () => {
         onToggleMaximize={handleToggleMaximizeComposer}
         onSend={handleSendEmail}
       />
+      }
       {isMobile ? (
         <DiscoverModalMobile isOpen={isDiscoverModalOpen} onClose={() => setIsDiscoverModalOpen(false)} />
       ) : (
@@ -831,7 +854,7 @@ const App: React.FC = () => {
         // Mobile view
         <div 
           onClick={toggleEmailSidebar}
-          className="fixed inset-0 bg-black/50 z-10 md:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-10 md:hidden"
           aria-hidden="true"
         ></div>
       )}
