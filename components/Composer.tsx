@@ -176,7 +176,7 @@ const Composer: React.FC<ComposerProps> = ({
             className={cn(
                 "fixed z-50 transition-all duration-300 ease-in-out",
                  isMaximized 
-                    ? "inset-auto w-[90vw] max-w-4xl h-[90vh] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                    ? "inset-auto w-[90vw] max-w-4xl h-[90dvh] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                     : isMinimized 
                         ? "bottom-0 right-4 w-full max-w-sm" 
                         : "bottom-0 right-4 w-full max-w-lg h-[500px]",

@@ -106,6 +106,46 @@ const DesignSystemViewMobile: React.FC = () => {
         { name: 'Border', variable: '--border', className: 'dark bg-border', usage: 'Subtle borders for glowing edges.' },
     ];
 
+    // Mobile Settings components for demonstration
+    const SettingsSection: React.FC<{ title: string, className?: string }> = ({ title, className }) => (
+        <h3 className={`px-4 text-xs font-bold text-muted-foreground uppercase tracking-wider ${className}`}>{title}</h3>
+    );
+    const SettingsCard: React.FC<{ children: React.ReactNode, className?: string }> = ({ children, className }) => (
+        <div className={`bg-card rounded-xl shadow-sm border border-border ${className}`}>
+            {children}
+        </div>
+    );
+    const SettingsItem: React.FC<{
+      title: string;
+      description?: string;
+      value?: string;
+      hasToggle?: boolean;
+      isToggleOn?: boolean;
+      onToggle?: (isOn: boolean) => void;
+      onClick?: () => void;
+      icon?: React.ReactNode;
+      disabled?: boolean;
+    }> = ({ title, description, value, hasToggle, isToggleOn, onToggle, onClick, icon, disabled = false }) => {
+      const content = (
+        <>
+          {icon && <div className="mr-4">{icon}</div>}
+          <div className="flex-grow">
+            <p className="font-medium text-foreground">{title}</p>
+            {description && <p className="text-sm text-muted-foreground">{description}</p>}
+            {value && !description && <p className="text-sm text-primary font-medium">{value}</p>}
+          </div>
+          {hasToggle && onToggle && (
+            <ToggleSwitch checked={!!isToggleOn} onChange={onToggle} />
+          )}
+        </>
+      );
+      const itemClasses = "flex items-center w-full text-left px-4 py-3";
+      if (onClick) {
+        return <button onClick={onClick} className={itemClasses}>{content}</button>;
+      }
+      return <div className={itemClasses}>{content}</div>;
+    };
+
     return (
         <div className="h-full w-full flex bg-background">
             <main className="flex-1 h-full overflow-y-auto p-4">
@@ -287,6 +327,40 @@ const DesignSystemViewMobile: React.FC = () => {
                          <Card className="p-4">
                             <p className="text-muted-foreground">The Email View uses a List for the inbox and a Detail View for the selected email. This Master-Detail pattern is responsive, collapsing to a single column on mobile.</p>
                         </Card>
+                    </SubSection>
+                    <SubSection title="Mobile Settings" description="Mobile settings screens use a consistent layout of sections, cards, and items to present information clearly and provide intuitive controls.">
+                        <ComponentDisplay title="Example Settings Screen">
+                            <div className="w-full space-y-4">
+                                <SettingsSection title="General" />
+                                <SettingsCard>
+                                    <SettingsItem title="Manage folders" description="Show, hide, or reorder your mail folders." onClick={() => {}} />
+                                    <div className="border-t border-border mx-4"></div>
+                                    <SettingsItem title="Dark mode" value="System" onClick={() => {}} />
+                                    <div className="border-t border-border mx-4"></div>
+                                    <SettingsItem title="Auto fit content" hasToggle isToggleOn={true} onToggle={() => {}} />
+                                </SettingsCard>
+                            </div>
+                        </ComponentDisplay>
+                        <CodeBlock language="tsx">
+{`// These components are used to structure mobile settings screens.
+
+const SettingsSection: React.FC<{ title: string }>;
+const SettingsCard: React.FC<{ children: React.ReactNode }>;
+const SettingsItem: React.FC<{
+  title: string;
+  description?: string;
+  value?: string;
+  hasToggle?: boolean;
+  // ...and more props
+}>;
+
+<SettingsSection title="General" />
+<SettingsCard>
+    <SettingsItem title="Dark mode" value="System" onClick={...} />
+    <SettingsItem title="Auto fit content" hasToggle isToggleOn={...} onToggle={...} />
+</SettingsCard>
+`}
+                        </CodeBlock>
                     </SubSection>
                 </Section>
 

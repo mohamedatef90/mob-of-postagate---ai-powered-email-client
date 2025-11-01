@@ -114,10 +114,60 @@ const DesignSystemView: React.FC = () => {
         { name: 'Foreground', variable: '--foreground', className: 'dark bg-foreground', usage: 'Primary text color for dark mode.' },
         { name: 'Border', variable: '--border', className: 'dark bg-border', usage: 'Subtle borders for glowing edges.' },
     ];
-
+    
+    // Mobile Settings components for demonstration
+    const SettingsSectionMobile: React.FC<{ title: string, className?: string }> = ({ title, className }) => (
+        <h3 className={`px-4 text-xs font-bold text-muted-foreground uppercase tracking-wider ${className}`}>{title}</h3>
+    );
+    const SettingsCardMobile: React.FC<{ children: React.ReactNode, className?: string }> = ({ children, className }) => (
+        <div className={`bg-card rounded-xl shadow-sm border border-border ${className}`}>
+            {children}
+        </div>
+    );
+    const SettingsItemMobile: React.FC<{
+      title: string;
+      description?: string;
+      value?: string;
+      hasToggle?: boolean;
+      isToggleOn?: boolean;
+      onToggle?: (isOn: boolean) => void;
+      onClick?: () => void;
+      icon?: React.ReactNode;
+      disabled?: boolean;
+    }> = ({ title, description, value, hasToggle, isToggleOn, onToggle, onClick, icon, disabled = false }) => {
+      const content = (
+        <>
+          {icon && <div className="mr-4">{icon}</div>}
+          <div className="flex-grow">
+            <p className="font-medium text-foreground">{title}</p>
+            {description && <p className="text-sm text-muted-foreground">{description}</p>}
+            {value && !description && <p className="text-sm text-primary font-medium">{value}</p>}
+          </div>
+          {hasToggle && onToggle && (
+            <ToggleSwitch checked={!!isToggleOn} onChange={onToggle} />
+          )}
+        </>
+      );
+      const itemClasses = "flex items-center w-full text-left px-4 py-3";
+      if (onClick) {
+        return <button onClick={onClick} className={itemClasses}>{content}</button>;
+      }
+      return <div className={itemClasses}>{content}</div>;
+    };
+    
     return (
         <div className="h-full w-full flex bg-background">
-            <main className="flex-1 h-full overflow-y-auto p-12">
+            <nav className="w-64 border-r border-border p-6 h-full overflow-y-auto shrink-0 hidden lg:block">
+                <h2 className="font-bold text-lg mb-4">PostaGate DS</h2>
+                <ul className="space-y-2">
+                    {sections.map(section => (
+                        <li key={section.id}>
+                            <a href={`#${section.id}`} className="text-muted-foreground hover:text-foreground text-sm font-medium">{section.title}</a>
+                        </li>
+                    ))}
+                </ul>
+            </nav>
+            <main className="flex-1 h-full overflow-y-auto p-6 md:p-10">
                 <SectionHeader 
                     title="PostaGate Design System"
                     description="A unified framework for creating consistent, accessible, and high-quality user experiences across all platforms."
@@ -297,6 +347,40 @@ const DesignSystemView: React.FC = () => {
                             <p className="text-muted-foreground">The Email View uses a List for the inbox and a Detail View for the selected email. This Master-Detail pattern is responsive, collapsing to a single column on mobile.</p>
                         </Card>
                     </SubSection>
+                    <SubSection title="Mobile Settings" description="Mobile settings screens use a consistent layout of sections, cards, and items to present information clearly and provide intuitive controls.">
+                        <ComponentDisplay title="Example Settings Screen">
+                            <div className="w-full space-y-4">
+                                <SettingsSectionMobile title="General" />
+                                <SettingsCardMobile>
+                                    <SettingsItemMobile title="Manage folders" description="Show, hide, or reorder your mail folders." onClick={() => {}} />
+                                    <div className="border-t border-border mx-4"></div>
+                                    <SettingsItemMobile title="Dark mode" value="System" onClick={() => {}} />
+                                    <div className="border-t border-border mx-4"></div>
+                                    <SettingsItemMobile title="Auto fit content" hasToggle isToggleOn={true} onToggle={() => {}} />
+                                </SettingsCardMobile>
+                            </div>
+                        </ComponentDisplay>
+                        <CodeBlock language="tsx">
+{`// These components are used to structure mobile settings screens.
+
+const SettingsSection: React.FC<{ title: string }>;
+const SettingsCard: React.FC<{ children: React.ReactNode }>;
+const SettingsItem: React.FC<{
+  title: string;
+  description?: string;
+  value?: string;
+  hasToggle?: boolean;
+  // ...and more props
+}>;
+
+<SettingsSection title="General" />
+<SettingsCard>
+    <SettingsItem title="Dark mode" value="System" onClick={...} />
+    <SettingsItem title="Auto fit content" hasToggle isToggleOn={...} onToggle={...} />
+</SettingsCard>
+`}
+                        </CodeBlock>
+                    </SubSection>
                 </Section>
 
                 <Section id="accessibility" title="5. Accessibility Standards">
@@ -333,7 +417,7 @@ const DesignSystemView: React.FC = () => {
 }`}
                         </CodeBlock>
                         <h4 className="font-semibold text-lg mt-6 mb-2">Tailwind Configuration</h4>
-                        <p className="text-muted-foreground mb-4">The `tailwind.config` file maps these CSS variables to Tailwind's utility classes.</p>
+                        <p className="text-muted-foreground mb-4">The \`tailwind.config\` file maps these CSS variables to Tailwind's utility classes.</p>
                         <CodeBlock language="javascript">
 {`tailwind.config = {
   theme: {
@@ -363,18 +447,6 @@ const DesignSystemView: React.FC = () => {
                     </SubSection>
                 </Section>
             </main>
-            <aside className="w-64 flex-shrink-0 border-l border-border h-full block backdrop-blur-xl">
-                 <nav className="sticky top-0 p-4 pt-8">
-                    <h3 className="font-semibold mb-3 text-foreground">Section Navigator</h3>
-                    <ul className="space-y-2">
-                        {sections.map(section => (
-                            <li key={section.id}>
-                                <a href={`#${section.id}`} className="text-sm text-muted-foreground hover:text-primary transition-colors">{section.title}</a>
-                            </li>
-                        ))}
-                    </ul>
-                 </nav>
-            </aside>
         </div>
     );
 };

@@ -107,7 +107,7 @@ const NewChatMenu: React.FC<NewChatMenuProps> = ({ isOpen, onClose, users, ancho
                            <p className="text-xs text-foreground/80">{selectedGroupUsers.length} selected</p>
                        </div>
                    </div>
-                   <div className="flex-1 overflow-y-auto max-h-[390px] p-2 no-scrollbar">
+                   <div className="flex-1 overflow-y-auto p-2 no-scrollbar">
                         {allOtherUsers.map(user => (
                             <label key={user.email} className="flex items-start space-x-3 p-2 rounded-md hover:bg-accent cursor-pointer">
                                 <input 
@@ -166,7 +166,7 @@ const NewChatMenu: React.FC<NewChatMenuProps> = ({ isOpen, onClose, users, ancho
                     <span>Create Group</span>
                  </Button>
               </div>
-              <div className="flex-1 overflow-y-auto max-h-[260px] p-2 no-scrollbar">
+              <div className="flex-1 overflow-y-auto p-2 no-scrollbar">
                 <h3 className="px-2 pb-1 text-xs font-semibold text-foreground/80 uppercase">Members</h3>
                 {filteredUsers.map(user => (
                     <div key={user.email} onClick={() => onSelectUser(user)} className="flex items-start space-x-3 p-2 rounded-md hover:bg-accent cursor-pointer">
@@ -197,7 +197,7 @@ const NewChatMenu: React.FC<NewChatMenuProps> = ({ isOpen, onClose, users, ancho
       <div
         ref={menuRef}
         style={position}
-        className="fixed z-50 w-[400px] h-[610px] backdrop-blur-xl rounded-2xl shadow-xl bg-card border border-border flex flex-col animate-scaleIn text-foreground"
+        className="fixed z-50 w-[400px] h-auto max-h-[90dvh] backdrop-blur-xl rounded-2xl shadow-xl bg-card border border-border flex flex-col animate-scaleIn text-foreground"
         role="dialog"
       >
         {renderContent()}

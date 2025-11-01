@@ -22,7 +22,7 @@ const AttachEmailModal: React.FC<AttachEmailModalProps> = ({ isOpen, onClose, th
             onClick={onClose}
         >
             <div 
-                className="bg-card rounded-xl shadow-xl p-4 relative w-full max-w-lg transition-all duration-200 flex flex-col h-[70vh] animate-scaleIn backdrop-blur-xl"
+                className="bg-card rounded-xl shadow-xl p-4 relative w-full max-w-lg transition-all duration-200 flex flex-col h-[70dvh] animate-scaleIn backdrop-blur-xl"
                 onClick={(e) => e.stopPropagation()}
             >
                 <header className="flex-shrink-0 flex items-center justify-between pb-3 border-b border-border">

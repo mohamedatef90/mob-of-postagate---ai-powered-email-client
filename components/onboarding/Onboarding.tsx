@@ -45,7 +45,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
     const stepKey = `step-${step}`;
 
     return (
-        <div className="h-screen w-screen bg-background text-foreground flex items-center justify-center p-4">
+        <div className="h-dvh w-screen bg-background text-foreground flex items-center justify-center p-4">
              <div key={stepKey} className="animate-fadeIn w-full h-full">
                 {renderStep()}
             </div>

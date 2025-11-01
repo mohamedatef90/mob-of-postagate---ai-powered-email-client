@@ -18,7 +18,7 @@ const AIAssistantModal: React.FC<AIAssistantModalProps> = ({ isOpen, onClose, se
             onClick={onClose}
         >
             <div 
-                className="bg-background rounded-t-2xl md:rounded-2xl shadow-xl w-full h-full md:w-full md:h-auto md:max-w-xl md:max-h-[90vh] flex flex-col animate-fadeInUp md:animate-scaleIn"
+                className="bg-background rounded-t-2xl md:rounded-2xl shadow-xl w-full h-full md:w-full md:h-auto md:max-w-xl md:max-h-[90dvh] flex flex-col animate-fadeInUp md:animate-scaleIn"
                 onClick={(e) => e.stopPropagation()}
                 style={{animationDuration: '0.3s'}}
             >

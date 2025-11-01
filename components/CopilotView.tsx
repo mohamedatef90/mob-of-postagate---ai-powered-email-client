@@ -3,7 +3,7 @@ import { GoogleGenAI } from '@google/genai';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import { you, MOCK_THREADS } from '../constants';
-import type { Thread } from '../types';
+import type { Thread, User } from '../types';
 import AttachEmailModal from './AttachEmailModal';
 
 // --- Type Definitions ---
@@ -108,7 +108,8 @@ const CopilotView: React.FC = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files.length > 0) {
-          const fileNames = Array.from(e.target.files).map(f => f.name).join(', ');
+          // FIX: Explicitly type the 'f' parameter as 'File' to resolve the TypeScript error.
+          const fileNames = Array.from(e.target.files).map((f: File) => f.name).join(', ');
           setInput(prev => `${prev} [Attached file(s): ${fileNames}]`);
       }
       if (e.target) e.target.value = '';
@@ -191,7 +192,6 @@ const CopilotView: React.FC = () => {
     }
   };
 
-  // FIX: Safely access participant name and message body to prevent runtime errors.
   const handleAttachEmail = (thread: Thread) => {
     const fromName = thread.participants[0]?.name ?? 'Unknown Sender';
     const firstMessageBody = (thread.messages[0]?.body ?? '').replace(/<[^>]*>/g, '').substring(0, 200);

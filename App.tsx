@@ -6,7 +6,7 @@ import CopilotViewMobile from './components/CopilotView.mobile';
 import ChatView from './components/ChatView';
 import ChatViewMobile from './components/ChatView.mobile';
 import SettingsView from './components/SettingsView';
-import SettingsViewMobile from './components/SettingsView.mobile';
+import { SettingsViewMobile } from './components/SettingsView.mobile';
 import { MOCK_THREADS, you, youLiverpool } from './constants';
 import type { Thread, Message } from './types';
 import PrimarySidebar from './components/PrimarySidebar';
@@ -30,6 +30,7 @@ import UndoSnackbar from './components/ui/UndoSnackbar';
 import UndoSnackbarMobile from './components/ui/UndoSnackbar.mobile';
 import Onboarding from './components/onboarding/Onboarding';
 import AIAssistantModal from './components/AIAssistantModal';
+import { AppContext } from './components/context/AppContext';
 
 
 type Theme = 'light' | 'dark' | 'system';
@@ -101,6 +102,9 @@ const App: React.FC = () => {
   const isResizingSidebar = useRef(false);
   const startSidebarX = useRef(0);
   const startSidebarWidth = useRef(0);
+
+  // State for new settings view
+  const [initialSettingsView, setInitialSettingsView] = useState<string | null>(null);
 
   const handleOnboardingComplete = () => {
     localStorage.setItem('onboardingComplete', 'true');
@@ -685,6 +689,38 @@ const App: React.FC = () => {
   }
   
   const currentUser = activeDomain === 'hogwarts' ? you : youLiverpool;
+  
+  const mapThemeToDarkModeOption = (t: string) => {
+    if (t === 'system') return 'Match phone setting';
+    if (t === 'dark') return 'On';
+    if (t === 'light') return 'Off';
+    return 'Match phone setting';
+  };
+
+  const mapDarkModeOptionToTheme = (option: string) => {
+    if (option === 'Match phone setting') return 'system';
+    if (option === 'On') return 'dark';
+    if (option === 'Off') return 'light';
+    return 'system';
+  };
+
+  const handleSetDarkModeOption = (option: string) => {
+      setTheme(mapDarkModeOptionToTheme(option) as Theme);
+  };
+
+  const accounts = [
+    { name: you.name, email: you.email, avatarUrl: you.avatarUrl },
+    { name: youLiverpool.name, email: youLiverpool.email, avatarUrl: youLiverpool.avatarUrl },
+  ];
+
+  const appContextValue = {
+    accounts,
+    darkModeOption: mapThemeToDarkModeOption(theme),
+    setDarkModeOption: handleSetDarkModeOption,
+    initialSettingsView,
+    setInitialSettingsView,
+  };
+
 
   const renderActiveView = () => {
     switch (activeModule) {
@@ -738,7 +774,7 @@ const App: React.FC = () => {
         case 'chat':
             return isMobile ? <ChatViewMobile /> : <ChatView />;
         case 'settings':
-            return isMobile ? <SettingsViewMobile theme={theme} setTheme={setTheme} /> : <SettingsView theme={theme} setTheme={setTheme} />;
+            return isMobile ? <SettingsViewMobile isOpen={activeModule === 'settings'} onClose={() => handleNavigateModule('email')} /> : <SettingsView theme={theme} setTheme={setTheme} />;
         case 'drive':
              return <DriveView />;
         case 'design-system':
@@ -766,141 +802,143 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="h-screen w-screen flex overflow-hidden">
-      {!isMobile && <Composer 
-        isOpen={isComposerOpen} 
-        onClose={handleCloseComposer} 
-        initialState={composerState} 
-        isMinimized={isComposerMinimized} 
-        isMaximized={isComposerMaximized}
-        onToggleMinimize={handleToggleMinimizeComposer}
-        onToggleMaximize={handleToggleMaximizeComposer}
-        onSend={handleSendEmail}
-      />
-      }
-      {isMobile ? (
-        <DiscoverModalMobile isOpen={isDiscoverModalOpen} onClose={() => setIsDiscoverModalOpen(false)} />
-      ) : (
-        <DiscoverModal isOpen={isDiscoverModalOpen} onClose={() => setIsDiscoverModalOpen(false)} />
-      )}
-      <AIAssistantModal
-          isOpen={isAIAssistantOpen}
-          onClose={handleCloseAIAssistant}
-          selectedThread={selectedThread}
-          mode={aiAssistantMode}
-      />
-      {snoozeTarget && (
-        <SnoozePopover 
-            anchorEl={snoozeTarget.anchorEl}
-            onClose={handleCloseSnooze}
-            onSnooze={handleSnoozeThread}
+    <AppContext.Provider value={appContextValue}>
+      <div className="h-dvh w-screen flex overflow-hidden">
+        {!isMobile && <Composer 
+          isOpen={isComposerOpen} 
+          onClose={handleCloseComposer} 
+          initialState={composerState} 
+          isMinimized={isComposerMinimized} 
+          isMaximized={isComposerMaximized}
+          onToggleMinimize={handleToggleMinimizeComposer}
+          onToggleMaximize={handleToggleMaximizeComposer}
+          onSend={handleSendEmail}
         />
-      )}
-      {isSearchFilterOpen && searchFilterAnchorEl && (
-        <SearchFilterPopover 
-            anchorEl={searchFilterAnchorEl}
-            onClose={handleCloseSearchFilters}
-            filters={{ sender: searchFilters.sender, dateRange: searchFilters.dateRange, status: searchFilters.status }}
-            onApply={handleApplySearchFilters}
+        }
+        {isMobile ? (
+          <DiscoverModalMobile isOpen={isDiscoverModalOpen} onClose={() => setIsDiscoverModalOpen(false)} />
+        ) : (
+          <DiscoverModal isOpen={isDiscoverModalOpen} onClose={() => setIsDiscoverModalOpen(false)} />
+        )}
+        <AIAssistantModal
+            isOpen={isAIAssistantOpen}
+            onClose={handleCloseAIAssistant}
+            selectedThread={selectedThread}
+            mode={aiAssistantMode}
         />
-      )}
-      {contextMenuTarget && (
-        <EmailContextMenu
-            x={contextMenuTarget.x}
-            y={contextMenuTarget.y}
-            thread={threads.find(t => t.id === contextMenuTarget.threadId) || null}
-            onClose={handleCloseContextMenu}
-            onArchive={handleArchiveThread}
-            onDelete={handleDeleteThread}
-            onMarkAsRead={handleMarkAsReadThread}
-            onToggleStar={handleToggleStarThread}
-            onSnooze={handleOpenSnooze}
-            onMoveToJunk={handleMoveToJunk}
-            onMute={handleMuteThread}
-            onBlockSender={handleBlockSender}
-            onToggleSelection={handleToggleSelection}
-        />
-      )}
-      {kebabMenuTarget && (
-        <KebabMenu
-            x={kebabMenuTarget.x}
-            y={kebabMenuTarget.y}
-            thread={threads.find(t => t.id === kebabMenuTarget.threadId) || null}
-            onClose={handleCloseKebabMenu}
-            onArchive={handleArchiveThread}
-            onDelete={handleDeleteThread}
-            onMarkAsRead={handleMarkAsReadThread}
-            onRemindMe={handleOpenSnooze}
-            onMoveToJunk={handleMoveToJunk}
-            onMute={handleMuteThread}
-            onBlockSender={handleBlockSender}
-            onComposeInteraction={(thread, type) => {
-                if (thread) handleComposeInteraction(thread, type)
-            }}
-        />
-      )}
-      <PrimarySidebar activeModule={activeModule} onNavigate={handleNavigateModule} />
+        {snoozeTarget && (
+          <SnoozePopover 
+              anchorEl={snoozeTarget.anchorEl}
+              onClose={handleCloseSnooze}
+              onSnooze={handleSnoozeThread}
+          />
+        )}
+        {isSearchFilterOpen && searchFilterAnchorEl && (
+          <SearchFilterPopover 
+              anchorEl={searchFilterAnchorEl}
+              onClose={handleCloseSearchFilters}
+              filters={{ sender: searchFilters.sender, dateRange: searchFilters.dateRange, status: searchFilters.status }}
+              onApply={handleApplySearchFilters}
+          />
+        )}
+        {contextMenuTarget && (
+          <EmailContextMenu
+              x={contextMenuTarget.x}
+              y={contextMenuTarget.y}
+              thread={threads.find(t => t.id === contextMenuTarget.threadId) || null}
+              onClose={handleCloseContextMenu}
+              onArchive={handleArchiveThread}
+              onDelete={handleDeleteThread}
+              onMarkAsRead={handleMarkAsReadThread}
+              onToggleStar={handleToggleStarThread}
+              onSnooze={handleOpenSnooze}
+              onMoveToJunk={handleMoveToJunk}
+              onMute={handleMuteThread}
+              onBlockSender={handleBlockSender}
+              onToggleSelection={handleToggleSelection}
+          />
+        )}
+        {kebabMenuTarget && (
+          <KebabMenu
+              x={kebabMenuTarget.x}
+              y={kebabMenuTarget.y}
+              thread={threads.find(t => t.id === kebabMenuTarget.threadId) || null}
+              onClose={handleCloseKebabMenu}
+              onArchive={handleArchiveThread}
+              onDelete={handleDeleteThread}
+              onMarkAsRead={handleMarkAsReadThread}
+              onRemindMe={handleOpenSnooze}
+              onMoveToJunk={handleMoveToJunk}
+              onMute={handleMuteThread}
+              onBlockSender={handleBlockSender}
+              onComposeInteraction={(thread, type) => {
+                  if (thread) handleComposeInteraction(thread, type)
+              }}
+          />
+        )}
+        <PrimarySidebar activeModule={activeModule} onNavigate={handleNavigateModule} />
+          
+        {activeModule === 'email' && 
+          <div className="md:flex h-full flex-shrink-0 relative">
+              <Sidebar 
+                  width={isMobile ? 280 : sidebarWidth}
+                  isSidebarOpen={isMobile ? isEmailSidebarOpen : true}
+                  activeView={activeEmailView} 
+                  activeDomain={activeDomain}
+                  onNavigate={handleNavigateEmail}
+                  snoozedCount={snoozedCount}
+                  unreadCounts={unreadCounts}
+                  totalUnread={totalUnread}
+                  onComposeClick={handleOpenComposer}
+              />
+              <Resizer onMouseDown={handleSidebarMouseDown} className="hidden md:flex" />
+          </div>
+        }
         
-      {activeModule === 'email' && 
-        <div className="md:flex h-full flex-shrink-0 relative">
-            <Sidebar 
-                width={isMobile ? 280 : sidebarWidth}
-                isSidebarOpen={isMobile ? isEmailSidebarOpen : true}
-                activeView={activeEmailView} 
-                activeDomain={activeDomain}
-                onNavigate={handleNavigateEmail}
-                snoozedCount={snoozedCount}
-                unreadCounts={unreadCounts}
-                totalUnread={totalUnread}
-                onComposeClick={handleOpenComposer}
-            />
-            <Resizer onMouseDown={handleSidebarMouseDown} className="hidden md:flex" />
-        </div>
-      }
-      
-      {activeModule === 'email' && isEmailSidebarOpen && (
-        // Mobile view
-        <div 
-          onClick={toggleEmailSidebar}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-10 md:hidden"
-          aria-hidden="true"
-        ></div>
-      )}
-      
-      <main className="flex-1 flex flex-col min-w-0 min-h-0">
-         <div key={activeModule} className="flex-1 flex flex-col min-w-0 animate-fadeIn overflow-hidden">
-            {renderActiveView()}
-         </div>
-      </main>
+        {activeModule === 'email' && isEmailSidebarOpen && (
+          // Mobile view
+          <div 
+            onClick={toggleEmailSidebar}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-10 md:hidden"
+            aria-hidden="true"
+          ></div>
+        )}
+        
+        <main className="flex-1 flex flex-col min-w-0 min-h-0">
+           <div key={activeModule} className="flex-1 flex flex-col min-w-0 animate-fadeIn overflow-hidden">
+              {renderActiveView()}
+           </div>
+        </main>
 
-      {undoState && (
-        isMobile ? (
-          <UndoSnackbarMobile 
-            message={undoState.message} 
-            onUndo={undoState.onUndo} 
-            onClose={closeUndo}
+        {undoState && (
+          isMobile ? (
+            <UndoSnackbarMobile 
+              message={undoState.message} 
+              onUndo={undoState.onUndo} 
+              onClose={closeUndo}
+            />
+          ) : (
+            <UndoSnackbar 
+              message={undoState.message} 
+              onUndo={undoState.onUndo} 
+              onClose={closeUndo}
+            />
+          )
+        )}
+
+         {/* Mobile view */}
+         {showEmailDetailOnMobile && selectedThread ? (
+          <EmailDetailActionBar 
+              thread={selectedThread}
+              onComposeInteraction={(thread, type) => handleComposeInteraction(thread, type)}
+              onArchive={handleArchiveThread}
+              onDelete={handleDeleteThread}
           />
         ) : (
-          <UndoSnackbar 
-            message={undoState.message} 
-            onUndo={undoState.onUndo} 
-            onClose={closeUndo}
-          />
-        )
-      )}
-
-       {/* Mobile view */}
-       {showEmailDetailOnMobile && selectedThread ? (
-        <EmailDetailActionBar 
-            thread={selectedThread}
-            onComposeInteraction={(thread, type) => handleComposeInteraction(thread, type)}
-            onArchive={handleArchiveThread}
-            onDelete={handleDeleteThread}
-        />
-      ) : (
-        <MobileBottomNav activeModule={activeModule} onNavigate={handleNavigateModule} />
-      )}
-    </div>
+          <MobileBottomNav activeModule={activeModule} onNavigate={handleNavigateModule} />
+        )}
+      </div>
+    </AppContext.Provider>
   );
 };
 
