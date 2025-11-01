@@ -62,7 +62,18 @@ const EmailListItemMobile: React.FC<EmailListItemProps> = ({
     longPressTriggered.current = false;
     if (selectedThreadIds.length === 0) {
         longPressTimer.current = window.setTimeout(() => {
-            onToggleSelection(thread.id);
+            // Trigger context menu instead of bulk select
+            const fakeEvent = {
+                preventDefault: () => {},
+                clientX,
+                clientY,
+            } as unknown as React.MouseEvent;
+            onContextMenu(fakeEvent, thread.id);
+
+            if (navigator.vibrate) {
+                navigator.vibrate(50); // Haptic feedback for long press
+            }
+
             longPressTriggered.current = true;
             longPressTimer.current = null;
         }, 500);

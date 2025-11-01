@@ -57,12 +57,11 @@ const PersonalizationStep: React.FC<PersonalizationStepProps> = ({ onNext, onBac
                             className="h-12 text-base backdrop-blur-xl bg-card/50 mt-1"
                         />
                     </div>
+                    <div className="pt-4">
+                        <Button size="lg" onClick={handleNext} disabled={!fullName} className="w-full rounded-full backdrop-blur-xl bg-primary/80 border border-white/20 shadow-lg">Continue</Button>
+                    </div>
                 </div>
             </main>
-            <footer className="flex items-center justify-between mt-8">
-                <Button variant="ghost" onClick={onBack} className="rounded-full">Back</Button>
-                <Button onClick={handleNext} disabled={!fullName} className="rounded-full backdrop-blur-xl bg-primary/80 border border-white/20 shadow-lg">Continue</Button>
-            </footer>
         </div>
     );
 };

@@ -12,6 +12,8 @@ interface EmailListHeaderMobileProps {
   toggleEmailSidebar: () => void;
   title: string;
   currentUser: User;
+  searchQuery: string;
+  onSearchQueryChange: (query: string) => void;
 }
 
 const EmailListHeaderMobile: React.FC<EmailListHeaderMobileProps> = ({
@@ -23,7 +25,9 @@ const EmailListHeaderMobile: React.FC<EmailListHeaderMobileProps> = ({
   onBulkMarkAsRead,
   toggleEmailSidebar,
   title,
-  currentUser
+  currentUser,
+  searchQuery,
+  onSearchQueryChange
 }) => {
   if (isBulkMode) {
     return (
@@ -44,16 +48,21 @@ const EmailListHeaderMobile: React.FC<EmailListHeaderMobileProps> = ({
   }
 
   return (
-    <div className="px-2 py-3 border-b border-border flex items-center justify-between flex-shrink-0 bg-background/80 backdrop-blur-lg">
-      <div className="flex items-center">
-        <Button variant="ghost" size="icon" onClick={toggleEmailSidebar} className="h-10 w-10">
+    <div className="px-2 py-3 border-b border-border flex items-center justify-between flex-shrink-0 bg-background/80 backdrop-blur-lg space-x-2">
+        <Button variant="ghost" size="icon" onClick={toggleEmailSidebar} className="h-10 w-10 flex-shrink-0">
           <i className="fa-solid fa-bars w-5 h-5"></i>
         </Button>
-        <h1 className="text-xl font-bold ml-2">{title}</h1>
-      </div>
-      <div className="flex items-center">
-        <img src={currentUser.avatarUrl} alt={currentUser.name} className="w-8 h-8 rounded-full" />
-      </div>
+        <div className="relative flex-1">
+            <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"></i>
+            <input
+                type="text"
+                placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => onSearchQueryChange(e.target.value)}
+                className="w-full bg-secondary border-none rounded-full pl-9 pr-4 h-10 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+        </div>
+        <img src={currentUser.avatarUrl} alt={currentUser.name} className="w-8 h-8 rounded-full flex-shrink-0" />
     </div>
   );
 };

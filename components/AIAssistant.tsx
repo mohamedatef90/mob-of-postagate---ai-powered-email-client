@@ -203,7 +203,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedThread, onClose, mode
     };
 
     return (
-        <aside className="w-full h-full bg-background border border-border rounded-xl shadow-lg flex flex-col overflow-hidden backdrop-blur-xl">
+        <div className="w-full h-full bg-background flex flex-col overflow-hidden">
            <div className="flex items-center justify-end p-2 flex-shrink-0">
                <button 
                    onClick={onClose}
@@ -229,7 +229,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedThread, onClose, mode
                     </button>
                 </div>
             </div>
-        </aside>
+        </div>
     );
 }
 

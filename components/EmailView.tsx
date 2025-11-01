@@ -184,6 +184,8 @@ const EmailView: React.FC<EmailViewProps> = ({
               onOpenKebabMenu={handleOpenKebabMenu}
               onCompose={onCompose}
               currentUser={currentUser}
+              searchQuery={searchQuery}
+              onSearchQueryChange={onSearchQueryChange}
             />
         </div>
         <div className={cn("h-full w-full flex flex-col", selectedThreadId ? "flex" : "hidden")}>
@@ -276,15 +278,6 @@ const EmailView: React.FC<EmailViewProps> = ({
             onComposeInteraction={(type, msg) => selectedThread && handleComposeInteraction(selectedThread, type, msg)}
             onToggleStar={() => selectedThread && handleToggleStarThread(selectedThread.id)}
           />
-          {isAIAssistantOpen && (
-            <div className="absolute top-0 right-0 h-full w-[400px] p-4 pl-0">
-                <AIAssistant 
-                    selectedThread={selectedThread} 
-                    onClose={handleCloseAIAssistant}
-                    mode={aiAssistantMode}
-                />
-            </div>
-          )}
         </div>
       </div>
     </div>

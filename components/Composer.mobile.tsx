@@ -13,6 +13,7 @@ const ComposerMobile: React.FC<ComposerMobileProps> = ({ onClose, initialState, 
     const [subject, setSubject] = useState('');
     const [body, setBody] = useState('');
     const [attachments, setAttachments] = useState<File[]>([]);
+    const [isConfirmCloseOpen, setIsConfirmCloseOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const hasContent = to || subject || body || attachments.length > 0;
@@ -26,10 +27,26 @@ const ComposerMobile: React.FC<ComposerMobileProps> = ({ onClose, initialState, 
     }, [initialState]);
 
     const handleClose = () => {
-        if(hasContent && !window.confirm("You have an unsaved draft. Are you sure you want to discard it?")) {
-            return;
+        if(hasContent) {
+            setIsConfirmCloseOpen(true);
+        } else {
+            onClose();
         }
+    };
+    
+    const handleSaveDraft = () => {
+        console.log('Draft saved.');
+        setIsConfirmCloseOpen(false);
         onClose();
+    };
+    
+    const handleDeleteDraft = () => {
+        setIsConfirmCloseOpen(false);
+        onClose();
+    };
+    
+    const handleContinueEditing = () => {
+        setIsConfirmCloseOpen(false);
     };
 
     const handleSend = () => {
@@ -59,7 +76,7 @@ const ComposerMobile: React.FC<ComposerMobileProps> = ({ onClose, initialState, 
             <header className="p-2 flex items-center justify-between flex-shrink-0 border-b border-border">
                 <div className="flex items-center">
                     <Button variant="ghost" size="icon" onClick={handleClose} className="h-10 w-10 text-muted-foreground">
-                        <i className="fa-solid fa-arrow-left w-5 h-5"></i>
+                        <i className="fa-solid fa-xmark w-5 h-5"></i>
                     </Button>
                     <h2 className="text-lg font-bold ml-2">New Message</h2>
                 </div>
@@ -100,6 +117,21 @@ const ComposerMobile: React.FC<ComposerMobileProps> = ({ onClose, initialState, 
                 />
             </div>
              <input type="file" multiple ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+
+             {isConfirmCloseOpen && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-end" onClick={handleContinueEditing}>
+                    <div className="bg-card w-full rounded-t-2xl p-4 animate-fadeInUp" onClick={(e) => e.stopPropagation()}>
+                        <div className="w-8 h-1 bg-muted rounded-full mx-auto mb-4"></div>
+                        <h3 className="text-lg font-semibold text-center text-foreground">Save or discard draft?</h3>
+                        <p className="text-sm text-muted-foreground text-center mt-1">You can find saved drafts later.</p>
+                        <div className="mt-6 space-y-2">
+                             <Button size="lg" className="w-full" onClick={handleSaveDraft}>Save Draft</Button>
+                             <Button variant="destructive" size="lg" className="w-full" onClick={handleDeleteDraft}>Delete Draft</Button>
+                             <Button variant="secondary" size="lg" className="w-full mt-4" onClick={handleContinueEditing}>Continue Editing</Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -58,11 +58,13 @@ const EmailDetailHeader: React.FC<EmailDetailHeaderProps> = ({
                         <span>Summarize</span>
                     </Button>
                 )}
-                 <Button variant="secondary" size="icon" className="rounded-full" onClick={onToggleAIAssistant} title="AI Assistant">
-                    <i className="fa-solid fa-sparkles w-5 h-5"></i>
+                 <Button variant="secondary" size="default" className="rounded-full" onClick={onToggleAIAssistant} title="AI Assistant">
+                    <i className="fa-solid fa-wand-magic-sparkles w-4 h-4 mr-2"></i>
+                    <span>Assistant</span>
                 </Button>
-                 <Button variant="secondary" size="icon" className="rounded-full" onClick={onScheduleMeetingClick} title="Insert Meeting">
-                    <i className="fa-regular fa-calendar w-5 h-5"></i>
+                 <Button variant="secondary" size="default" className="rounded-full" onClick={onScheduleMeetingClick} title="Insert Meeting">
+                    <i className="fa-regular fa-calendar w-4 h-4 mr-2"></i>
+                    <span>Meeting</span>
                 </Button>
             </div>
         </header>

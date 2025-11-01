@@ -29,6 +29,7 @@ import EmailDetailActionBar from './components/EmailDetailActionBar';
 import UndoSnackbar from './components/ui/UndoSnackbar';
 import UndoSnackbarMobile from './components/ui/UndoSnackbar.mobile';
 import Onboarding from './components/onboarding/Onboarding';
+import AIAssistantModal from './components/AIAssistantModal';
 
 
 type Theme = 'light' | 'dark' | 'system';
@@ -782,6 +783,12 @@ const App: React.FC = () => {
       ) : (
         <DiscoverModal isOpen={isDiscoverModalOpen} onClose={() => setIsDiscoverModalOpen(false)} />
       )}
+      <AIAssistantModal
+          isOpen={isAIAssistantOpen}
+          onClose={handleCloseAIAssistant}
+          selectedThread={selectedThread}
+          mode={aiAssistantMode}
+      />
       {snoozeTarget && (
         <SnoozePopover 
             anchorEl={snoozeTarget.anchorEl}
@@ -811,6 +818,7 @@ const App: React.FC = () => {
             onMoveToJunk={handleMoveToJunk}
             onMute={handleMuteThread}
             onBlockSender={handleBlockSender}
+            onToggleSelection={handleToggleSelection}
         />
       )}
       {kebabMenuTarget && (

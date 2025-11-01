@@ -86,6 +86,7 @@ const CopilotView: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isAttachEmailModalOpen, setIsAttachEmailModalOpen] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selectedConversation = useMemo(() => {
     if (selectedConversationId === 'new') return null;
@@ -100,6 +101,18 @@ const CopilotView: React.FC = () => {
     setSelectedConversationId('new');
     setInput('');
   }
+  
+  const handleAttachClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files.length > 0) {
+          const fileNames = Array.from(e.target.files).map(f => f.name).join(', ');
+          setInput(prev => `${prev} [Attached file(s): ${fileNames}]`);
+      }
+      if (e.target) e.target.value = '';
+  };
 
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return;
@@ -178,8 +191,11 @@ const CopilotView: React.FC = () => {
     }
   };
 
+  // FIX: Safely access participant name and message body to prevent runtime errors.
   const handleAttachEmail = (thread: Thread) => {
-    const emailContext = `\n\n--- Linked Email ---\nSubject: ${thread.subject}\nFrom: ${thread.participants[0].name}\n\n${thread.messages[0].body.replace(/<[^>]*>/g, '').substring(0, 200)}...\n---`;
+    const fromName = thread.participants[0]?.name ?? 'Unknown Sender';
+    const firstMessageBody = (thread.messages[0]?.body ?? '').replace(/<[^>]*>/g, '').substring(0, 200);
+    const emailContext = `\n\n--- Linked Email ---\nSubject: ${thread.subject}\nFrom: ${fromName}\n\n${firstMessageBody}...\n---`;
     setInput(prev => `${prev}${emailContext}`.trim());
     setIsAttachEmailModalOpen(false);
   };
@@ -265,36 +281,42 @@ const CopilotView: React.FC = () => {
           {/* Input area */}
           <div className="p-4 border-t border-border bg-background">
               <div className="max-w-3xl mx-auto">
-                   <div className="flex items-center space-x-2 w-full bg-secondary border border-border rounded-xl p-2 pr-3">
-                      <Button variant="ghost" size="icon" className="flex-shrink-0" aria-label="Attach file">
-                          <i className="fa-solid fa-paperclip w-5 h-5 text-muted-foreground"></i>
-                      </Button>
-                      <Button variant="ghost" size="icon" className="flex-shrink-0" aria-label="Link email" onClick={() => setIsAttachEmailModalOpen(true)}>
-                          <i className="fa-solid fa-at w-5 h-5 text-muted-foreground"></i>
-                      </Button>
-                      <textarea
-                          placeholder="Message WP Flag..."
-                          value={input}
-                          onChange={(e) => setInput(e.target.value)}
-                          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
-                          rows={1}
-                          className="flex-1 bg-transparent py-3 px-2 text-base text-secondary-foreground placeholder-muted-foreground focus:outline-none resize-none max-h-[200px] no-scrollbar"
-                          onInput={(e) => {
-                              const target = e.target as HTMLTextAreaElement;
-                              target.style.height = 'auto';
-                              target.style.height = `${target.scrollHeight}px`;
-                          }}
-                      />
-                      <Button
-                          onClick={handleSendMessage}
-                          disabled={isLoading || !input.trim()}
-                          size="icon"
-                          className="rounded-full flex-shrink-0 h-11 w-11"
-                          aria-label="Send message"
-                      >
-                          <i className="fa-solid fa-arrow-up w-5 h-5"></i>
-                      </Button>
-                  </div>
+                   <div className="flex items-end space-x-2 w-full">
+                        <input type="file" ref={fileInputRef} onChange={handleFileChange} multiple className="hidden" />
+                        <Button variant="secondary" size="icon" className="flex-shrink-0 h-11 w-11 rounded-full" aria-label="Attach" onClick={handleAttachClick}>
+                            <i className="fa-solid fa-paperclip w-5 h-5"></i>
+                        </Button>
+
+                        <div className="flex-1 relative">
+                            <textarea
+                                placeholder="Message WP Flag..."
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
+                                rows={1}
+                                className="w-full bg-secondary border border-border rounded-full py-3 px-4 text-base text-secondary-foreground placeholder-muted-foreground focus:outline-none resize-none max-h-[200px] no-scrollbar focus:ring-2 focus:ring-ring"
+                                onInput={(e) => {
+                                    const target = e.target as HTMLTextAreaElement;
+                                    target.style.height = 'auto';
+                                    target.style.height = `${target.scrollHeight}px`;
+                                }}
+                            />
+                        </div>
+                        
+                        <Button
+                            onClick={handleSendMessage}
+                            disabled={isLoading || !input.trim()}
+                            size="icon"
+                            className="rounded-full flex-shrink-0 h-11 w-11"
+                            aria-label="Send message"
+                        >
+                            {isLoading ? (
+                                <i className="fa-solid fa-spinner animate-spin w-5 h-5"></i>
+                            ) : (
+                                <i className="fa-solid fa-arrow-up w-5 h-5"></i>
+                            )}
+                        </Button>
+                    </div>
                   <p className="text-xs text-center text-muted-foreground mt-2">WP Flag may display inaccurate info, so double-check its responses.</p>
               </div>
           </div>

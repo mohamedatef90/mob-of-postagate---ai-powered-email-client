@@ -39,6 +39,8 @@ interface EmailListMobileProps {
   onClearSelection: () => void;
   onCompose: () => void;
   currentUser: User;
+  searchQuery: string;
+  onSearchQueryChange: (query: string) => void;
 }
 
 const THREAD_ITEM_HEIGHT = 92;
@@ -73,11 +75,21 @@ const EmailListMobile: React.FC<EmailListMobileProps> = ({
     toggleEmailSidebar,
     onClearSelection,
     onCompose,
-    currentUser
+    currentUser,
+    searchQuery,
+    onSearchQueryChange,
 }) => {
     
+  const [activeCategory, setActiveCategory] = useState<'primary' | 'social' | 'promotions' | 'updates'>('primary');
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
+
+  const categoryFilteredThreads = useMemo(() => {
+    if (activeView === 'inbox') {
+      return threads.filter(t => t.category === activeCategory);
+    }
+    return threads;
+  }, [threads, activeView, activeCategory]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
       setScrollTop(e.currentTarget.scrollTop);
@@ -89,9 +101,9 @@ const EmailListMobile: React.FC<EmailListMobileProps> = ({
     const startOfLastWeek = new Date(startOfToday);
     startOfLastWeek.setDate(startOfLastWeek.getDate() - 7);
 
-    const todayThreads = threads.filter(t => new Date(t.timestamp) >= startOfToday);
-    const lastWeekThreads = threads.filter(t => new Date(t.timestamp) < startOfToday && new Date(t.timestamp) >= startOfLastWeek);
-    const olderThreads = threads.filter(t => new Date(t.timestamp) < startOfLastWeek);
+    const todayThreads = categoryFilteredThreads.filter(t => new Date(t.timestamp) >= startOfToday);
+    const lastWeekThreads = categoryFilteredThreads.filter(t => new Date(t.timestamp) < startOfToday && new Date(t.timestamp) >= startOfLastWeek);
+    const olderThreads = categoryFilteredThreads.filter(t => new Date(t.timestamp) < startOfLastWeek);
       
     const items: any[] = [];
     let currentOffset = 40;
@@ -112,7 +124,7 @@ const EmailListMobile: React.FC<EmailListMobileProps> = ({
     addSection('OLDER', olderThreads);
       
     return { allItems: items, totalHeight: currentOffset };
-  }, [threads]);
+  }, [categoryFilteredThreads]);
 
   const containerHeight = containerRef.current?.clientHeight || 0;
   
@@ -137,8 +149,8 @@ const EmailListMobile: React.FC<EmailListMobileProps> = ({
   const title = formatViewTitle(activeView);
   const isBulkMode = selectedThreadIds.length > 0;
   
-  const pillViews = ['inbox', 'todos', 'archive'];
-  const showPillMenu = pillViews.includes(activeView) && !isBulkMode;
+  const pillCategories: Array<'primary' | 'social' | 'promotions' | 'updates'> = ['primary', 'social', 'promotions', 'updates'];
+  const showPillMenu = activeView === 'inbox' && !isBulkMode;
 
   return (
     <div className="bg-card flex flex-col h-full w-full dark:backdrop-blur-xl relative">
@@ -152,8 +164,10 @@ const EmailListMobile: React.FC<EmailListMobileProps> = ({
         toggleEmailSidebar={toggleEmailSidebar}
         title={title}
         currentUser={currentUser}
+        searchQuery={searchQuery}
+        onSearchQueryChange={onSearchQueryChange}
       />
-      {threads.length === 0 ? (
+      {categoryFilteredThreads.length === 0 ? (
         (() => {
             const config = EMPTY_STATE_CONFIG[activeView] || EMPTY_STATE_CONFIG.default;
             return (
@@ -206,12 +220,12 @@ const EmailListMobile: React.FC<EmailListMobileProps> = ({
        {showPillMenu && (
           <div className="absolute top-[60px] left-1/2 -translate-x-1/2 z-10 w-[90%] max-w-sm animate-fadeInDown" style={{animationDuration: '0.3s'}}>
               <div className="bg-card/70 backdrop-blur-xl rounded-full shadow-lg border border-white/20 flex p-1 justify-around space-x-1">
-                  {pillViews.map(view => {
-                      const isActive = activeView === view;
+                  {pillCategories.map(category => {
+                      const isActive = activeCategory === category;
                       return (
                         <button 
-                          key={view}
-                          onClick={() => onNavigate(view)}
+                          key={category}
+                          onClick={() => setActiveCategory(category)}
                           className={cn(
                               "w-full text-center px-4 py-3 text-sm font-semibold rounded-full transition-all duration-200",
                               isActive
@@ -219,7 +233,7 @@ const EmailListMobile: React.FC<EmailListMobileProps> = ({
                                 : 'text-muted-foreground hover:bg-accent/50'
                           )}
                         >
-                          {formatViewTitle(view)}
+                          {category.charAt(0).toUpperCase() + category.slice(1)}
                         </button>
                       )
                   })}

@@ -15,11 +15,12 @@ interface EmailContextMenuProps {
   onMoveToJunk: (threadId: string) => void;
   onMute: (threadId: string) => void;
   onBlockSender: (threadId: string) => void;
+  onToggleSelection: (threadId: string) => void;
 }
 
 const EmailContextMenu: React.FC<EmailContextMenuProps> = ({ 
     x, y, thread, onClose, onArchive, onDelete, onMarkAsRead, onToggleStar, onSnooze,
-    onMoveToJunk, onMute, onBlockSender 
+    onMoveToJunk, onMute, onBlockSender, onToggleSelection
 }) => {
     const fakeAnchorRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -63,6 +64,10 @@ const EmailContextMenu: React.FC<EmailContextMenuProps> = ({
     
     return (
         <ContextMenu x={x} y={y} onClose={onClose}>
+            <ContextMenuItem icon="fa-solid fa-check-to-slot" onClick={() => handleAction(onToggleSelection)}>
+                Select
+            </ContextMenuItem>
+            <ContextMenuSeparator />
             <ContextMenuItem icon="fa-solid fa-reply" onClick={onClose} disabled>Reply</ContextMenuItem>
             <ContextMenuItem icon="fa-solid fa-reply-all" onClick={onClose} disabled>Reply All</ContextMenuItem>
             <ContextMenuItem icon="fa-solid fa-share" onClick={onClose} disabled>Forward</ContextMenuItem>
